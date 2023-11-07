@@ -6,11 +6,6 @@ const tagSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true
-    },
-    id: {
-        type: String,
-        required: true,
-        unique: true
     }
 });
 
