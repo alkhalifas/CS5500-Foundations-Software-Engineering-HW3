@@ -19,10 +19,30 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 app.use(cors());
 app.use(express.json());
 
-app.get('/questions', async (req, res) => {
+app.get('/all', async (req, res) => {
     try {
         const questions = await Question.find().populate('tags answers');
         res.json(questions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/questions', async (req, res) => {
+    try {
+        const questions = await Question.find();
+        res.json(questions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/tags', async (req, res) => {
+    try {
+        const tags = await Tag.find();
+        res.json(tags);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
