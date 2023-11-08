@@ -1,0 +1,72 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Calibri, Arial, sans-serif;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.header {
+    font-size: 40px;
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.search-bar {
+    margin: 10px auto;
+    max-width: 200px;
+    display: flex;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.content-container {
+    display: flex;
+    flex: 1;
+}
+
+.menu {
+    width: 25%;
+    background-color: #f2f2f2;
+    padding: 20px;
+    box-sizing: border-box;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+    overflow-y: auto;
+}
+
+.badge {
+    display: inline-block;
+    background-color: #007bff; /* Badge background color */
+    color: #ffffff; /* Text color */
+    padding: 0.3em 0.6em; /* Padding inside the badge */
+    border-radius: 0.25em; /* Border radius to create rounded corners */
+    margin-right: 0.5em; /* Margin between badges */
+    font-size: 0.8em; /* Font size */
+}
+
+.asked-by {
+    color: red; /* Text color for askedBy name */
+}
+
+.blue-filter {
+    color: royalblue;
+}
