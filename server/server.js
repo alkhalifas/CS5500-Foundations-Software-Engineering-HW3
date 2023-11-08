@@ -168,6 +168,30 @@ app.post('/questions', async (req, res) => {
     }
 });
 
+/*
+Method that gets questions for a given tag
+ */
+// Define a route to get all questions related to a specific tag
+app.get('/questions/tag/:tagName', async (req, res) => {
+    const { tagName } = req.params;
+
+    try {
+        // Find the tag by name (case-insensitive)
+        const tag = await Tag.findOne({ name: tagName.toLowerCase() });
+
+        if (!tag) {
+            return res.status(404).json({ error: 'Tag not found' });
+        }
+
+        // Find all questions that have the specified tag
+        const questions = await Question.find({ tags: tag._id }).populate('tags answers');
+
+        res.json(questions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 
 app.listen(PORT, () => {
