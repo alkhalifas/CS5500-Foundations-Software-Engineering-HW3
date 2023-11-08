@@ -74,7 +74,7 @@ app.get('/questions/all', async (req, res) => {
         res.json(questions);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Error getting all questions, tags, and answers' });
     }
 });
 
@@ -87,7 +87,7 @@ app.get('/questions', async (req, res) => {
         res.json(questions);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Error getting all questions' });
     }
 });
 
@@ -100,7 +100,7 @@ app.get('/tags', async (req, res) => {
         res.json(tags);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Error getting tags' });
     }
 });
 
@@ -118,7 +118,7 @@ app.get('/questions/:questionId/answers', async (req, res) => {
         res.json(answers);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Error getting answers to question' });
     }
 });
 
@@ -164,7 +164,7 @@ app.post('/questions', async (req, res) => {
         res.status(201).json(newQuestion);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Error adding new question' });
     }
 });
 
@@ -176,20 +176,46 @@ app.get('/questions/tag/:tagName', async (req, res) => {
     const { tagName } = req.params;
 
     try {
-        // Find the tag by name (case-insensitive)
         const tag = await Tag.findOne({ name: tagName.toLowerCase() });
 
         if (!tag) {
             return res.status(404).json({ error: 'Tag not found' });
         }
 
-        // Find all questions that have the specified tag
         const questions = await Question.find({ tags: tag._id }).populate('tags answers');
 
         res.json(questions);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Error getting questions for tag' });
+    }
+});
+
+/*
+Method that increments views by 1
+ */
+app.post('/questions/increment-views/:questionId', async (req, res) => {
+    const { questionId } = req.params;
+
+    try {
+        // Find the question by Id
+        // const question = await Question.findById(questionId);
+        const question = await Question.findById(questionId);
+
+        if (!question) {
+            return res.status(404).json({ error: 'Question not found' });
+        }
+
+        // Increment view by 1
+        question.views += 1;
+
+        // Save it
+        await question.save();
+
+        res.json(question);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error incrementing views' });
     }
 });
 
