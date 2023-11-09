@@ -192,6 +192,64 @@ app.get('/questions/tag/:tagName', async (req, res) => {
 });
 
 /*
+Method that returns questions for a given tan id
+ */
+app.get('/questions/tag-id/:tagId', async (req, res) => {
+    const { tagId } = req.params;
+
+    try {
+        const tag = await Tag.findById(tagId);
+
+        if (!tag) {
+            return res.status(404).json({ error: 'Tag not found' });
+        }
+
+        const questions = await Question.find({ tags: tag._id }).populate('tags answers');
+
+        res.json(questions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error getting questions for tag' });
+    }
+});
+
+
+/*
+Method that
+ */
+app.get('/tags-with-count', async (req, res) => {
+    try {
+        const tagCounts = await Question.aggregate([
+            {
+                $unwind: '$tags',
+            },
+            {
+                $group: {
+                    _id: '$tags',
+                    count: { $sum: 1 },
+                },
+            },
+        ]);
+
+        const tagsWithCount = await Promise.all(
+            tagCounts.map(async (tagCount) => {
+                const tag = await Tag.findById(tagCount._id);
+                return {
+                    _id: tagCount._id,
+                    name: tag ? tag.name : 'Unknown',
+                    count: tagCount.count,
+                };
+            })
+        );
+
+        res.json(tagsWithCount);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error getting tags with counts' });
+    }
+});
+
+/*
 Method that increments views by 1
  */
 app.post('/questions/increment-views/:questionId', async (req, res) => {
@@ -219,7 +277,20 @@ app.post('/questions/increment-views/:questionId', async (req, res) => {
     }
 });
 
+// Display message when disconnected
+process.on('SIGINT', () => {
+    mongoose.connection.close()
+        .then(() => {
+            console.log('Server closed. Database instance disconnected');
+            process.exit(0);
+        })
+        .catch(err => {
+            console.error('Error closing database connection:', err);
+            process.exit(1);
+        });
+});
 
+// Display message when starting
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
