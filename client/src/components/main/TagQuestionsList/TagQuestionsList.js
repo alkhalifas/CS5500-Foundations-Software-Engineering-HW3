@@ -5,12 +5,12 @@ import formatQuestionText from "../utils";
 import AnswersPage from "../Answers/AnswersPage";
 import axios from "axios";
 
-export default function TagQuestionsList({ tagId }) {
+export default function TagQuestionsList({ tag }) {
     const [selectedQuestion, setSelectedQuestion] = useState(null);
     const [questions, setQuestions] = useState([]);
 
     useEffect(() => {
-        const apiUrl = `http://localhost:8000/questions/tag-id/${tagId}`;
+        const apiUrl = `http://localhost:8000/questions/tag-id/${tag._id}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -37,7 +37,7 @@ export default function TagQuestionsList({ tagId }) {
         <>
             <div className="header-container">
                 <h3>{questions.length} questions</h3>
-                <h3 className={"blue-filter"}>Filter: {`"${tagId}"`}</h3>
+                <h3 className={"blue-filter"}>Filter: {`"${tag.name}"`}</h3>
             </div>
 
             {selectedQuestion ? (

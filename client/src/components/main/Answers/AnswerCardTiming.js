@@ -19,7 +19,7 @@ function formatTime(date) {
 }
 
 export default function AnswerCardTiming({ answer }) {
-    const ansDate = new Date(answer.ansDate);
+    const ansDate = new Date(answer.ans_date_time);
     const now = new Date();
 
     const timeDifference = Math.floor((now - ansDate) / 1000);
@@ -48,7 +48,7 @@ export default function AnswerCardTiming({ answer }) {
 
     return (
         <div className="answer-card-timing">
-            <span className="answered-by" style={{ color: 'blue' }}>{answer.ansBy}</span> {metadata}
+            <span className="answered-by" style={{ color: 'blue' }}>{answer.ans_by}</span> {metadata}
         </div>
     );
 }
