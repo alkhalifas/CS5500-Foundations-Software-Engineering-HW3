@@ -29,8 +29,9 @@ export default function TagsList() {
         setShowForm(true);
     };
 
-    const handleTagClick = (tagId) => {
-        setSelectedTag(tagId);
+    const handleTagClick = (tag) => {
+        setSelectedTag(tag);
+        console.log("handleTagClick: ", tag)
     };
 
     const handleFormSubmit = (formData) => {
@@ -44,7 +45,7 @@ export default function TagsList() {
                 <QuestionForm onSubmit={handleFormSubmit} onCancel={() => setShowForm(false)} />
             ) : (
                 selectedTag ? (
-                        <TagQuestionsList tagId={selectedTag} />
+                        <TagQuestionsList tag={selectedTag} />
                     ) : (
                         <div>
                             <div className="header-container">
@@ -57,7 +58,7 @@ export default function TagsList() {
                                 {tags.map((tag) => (
                                     <div key={tag._id} className="tag-box tagNode">
                                         <span
-                                            onClick={() => handleTagClick(tag._id)}
+                                            onClick={() => handleTagClick(tag)}
                                             className="tag-link"
                                         >{tag.name}</span>
                                         <p>({tag.count} questions)</p>

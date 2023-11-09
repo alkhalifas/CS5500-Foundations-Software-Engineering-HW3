@@ -4,7 +4,7 @@ import "./answerForm.css"
 export default function AnswerForm({ onSubmit }) {
 
     const initialFormData = {
-        ansBy: '',
+        ans_by: '',
         text: '',
     };
 
@@ -33,8 +33,8 @@ export default function AnswerForm({ onSubmit }) {
         const errors = {};
 
         // Username validation
-        if (!data.ansBy.trim()) {
-            errors.ansBy = "Username cannot be empty";
+        if (!data.ans_by.trim()) {
+            errors.ans_by = "Username cannot be empty";
         }
 
         // Text validation
@@ -66,12 +66,12 @@ export default function AnswerForm({ onSubmit }) {
                     type="text"
                     id="answerUsernameInput"
                     name="ansBy"
-                    value={formData.ansBy}
+                    value={formData.ans_by}
                     onChange={handleInputChange}
                     placeholder="Add username"
                 />
-                {validationErrors.ansBy && (
-                    <div className="error-message">{validationErrors.ansBy}</div>
+                {validationErrors.ans_by && (
+                    <div className="error-message">{validationErrors.ans_by}</div>
                 )}
             </label>
             <label>

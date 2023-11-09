@@ -7,12 +7,18 @@ In the sections below, list and describe each contribution briefly.
 
 ## Team Member 1 Contribution
 - [X] Schemas
-- [X] Server API List
+- [X] Populate Integration
+- [X] Server API Routes
+- [X] Server Requirements
 - [X] Tags Page
-- [ ] Questions Page
 - [ ] Questions Per Tag Page
 
 ## Team Member 2 Contribution
+- [ ] Questions List
+- [ ] Search 
+- [ ] Create Question
+- [ ] Answer Question
+- [ ] Questions List
 
 *Add your team's class and sequence diagrams to the design directory*. It is enough to document the design of the server. You can assume the client to be an external entity that will trigger events in the server.
 
