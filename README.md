@@ -6,6 +6,11 @@ Read homework specifications [here](https://northeastern-my.sharepoint.com/:w:/r
 In the sections below, list and describe each contribution briefly.
 
 ## Team Member 1 Contribution
+- [X] Schemas
+- [X] Server API List
+- [X] Tags Page
+- [ ] Questions Page
+- [ ] Questions Per Tag Page
 
 ## Team Member 2 Contribution
 
