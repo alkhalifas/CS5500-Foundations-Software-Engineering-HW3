@@ -219,7 +219,20 @@ app.post('/questions/increment-views/:questionId', async (req, res) => {
     }
 });
 
+// Display message when disconnected
+process.on('SIGINT', () => {
+    mongoose.connection.close()
+        .then(() => {
+            console.log('Server closed. Database instance disconnected');
+            process.exit(0);
+        })
+        .catch(err => {
+            console.error('Error closing database connection:', err);
+            process.exit(1);
+        });
+});
 
+// Display message when starting
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
