@@ -1,17 +1,33 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import dataModel from '../../../models/datamodel';
 import QuestionCardTiming from "../questionList/QuestionCardTiming";
 import formatQuestionText from "../utils";
 import AnswersPage from "../Answers/AnswersPage";
+import axios from "axios";
 
 export default function TagQuestionsList({ tagId }) {
     const [selectedQuestion, setSelectedQuestion] = useState(null);
+    const [questions, setQuestions] = useState([]);
 
-    const questionsWithCurrentTag = dataModel.getAllQuestions().filter(question =>
-        question.tagIds.includes(tagId)
-    );
+    useEffect(() => {
+        const apiUrl = `http://localhost:8000/questions/tag-id/${tagId}`;
 
-    const tagName = dataModel.getTagNameById(tagId);
+        axios.get(apiUrl)
+            .then(response => {
+                setQuestions(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching questions:', error);
+            });
+    }, []);
+
+    console.log("questions: ", questions)
+
+    // const questionsWithCurrentTag = dataModel.getAllQuestions().filter(question =>
+    //     question.tagIds.includes(tagId)
+    // );
+
+    // const tagName = dataModel.getTagNameById(tagId);
 
     const handleQuestionClick = (question) => {
         setSelectedQuestion(question);
@@ -20,8 +36,8 @@ export default function TagQuestionsList({ tagId }) {
     return (
         <>
             <div className="header-container">
-                <h3>{questionsWithCurrentTag.length} questions</h3>
-                <h3 className={"blue-filter"}>Filter: {`"${tagName}"`}</h3>
+                <h3>{questions.length} questions</h3>
+                <h3 className={"blue-filter"}>Filter: {`"${tagId}"`}</h3>
             </div>
 
             {selectedQuestion ? (
@@ -34,16 +50,16 @@ export default function TagQuestionsList({ tagId }) {
                 </div>
             ) : (
                 <div className="question-cards">
-                    {questionsWithCurrentTag.map((question, index) => (
-                        <div key={question.qid}>
+                    {questions.map((question, index) => (
+                        <div key={question._id}>
                             <div
-                                key={question.qid}
+                                key={question._id}
                                 className="question-card"
                                 // onClick={() => handleQuestionClick(question)}
                             >
                                 <div className={"question-left postStats"}>
                                     <p>{question.views} views</p>
-                                    <p>{dataModel.getQuestionAnswers(question.qid).length} answers</p>
+                                    <p>{question.answers.length} answers</p>
                                 </div>
                                 <div className={"question-mid"}>
                                     <h4 className={"postTitle"}
@@ -54,7 +70,7 @@ export default function TagQuestionsList({ tagId }) {
                                     {/*<p>Tags: {question.tags}</p>*/}
                                     {/*<p>Tags: {question.getTagNames(dataModel.tags).join(', ')}</p>*/}
                                     <div className="tags">
-                                        {question.getTagsWithNames(dataModel.tags).map(tag => (
+                                        {question.tags.map(tag => (
                                             <span key={tag.id} className="badge">{tag.name}</span>
                                         ))}
                                     </div>
@@ -64,7 +80,7 @@ export default function TagQuestionsList({ tagId }) {
                                     <QuestionCardTiming question={question} />
                                 </div>
                             </div>
-                            {index !== questionsWithCurrentTag.length - 1 && <div className="dotted-line" />}
+                            {index !== questions.length - 1 && <div className="dotted-line" />}
                         </div>
                     ))}
                 </div>

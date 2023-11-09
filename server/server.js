@@ -192,6 +192,29 @@ app.get('/questions/tag/:tagName', async (req, res) => {
 });
 
 /*
+Method that returns questions for a given tan id
+ */
+app.get('/questions/tag-id/:tagId', async (req, res) => {
+    const { tagId } = req.params;
+
+    try {
+        const tag = await Tag.findById(tagId);
+
+        if (!tag) {
+            return res.status(404).json({ error: 'Tag not found' });
+        }
+
+        const questions = await Question.find({ tags: tag._id }).populate('tags answers');
+
+        res.json(questions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error getting questions for tag' });
+    }
+});
+
+
+/*
 Method that
  */
 app.get('/tags-with-count', async (req, res) => {
