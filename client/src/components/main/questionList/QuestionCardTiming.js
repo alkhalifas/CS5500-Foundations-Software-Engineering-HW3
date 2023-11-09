@@ -19,7 +19,7 @@ function formatTime(date) {
 }
 
 export default function QuestionCardTiming({ question }) {
-    const askDate = new Date(question.askDate);
+    const askDate = new Date(question.ask_date_time);
     const now = new Date();
 
     const timeDifference = Math.floor((now - askDate) / 1000);
@@ -48,7 +48,7 @@ export default function QuestionCardTiming({ question }) {
 
     return (
         <div className="question-card-timing">
-            <span className="asked-by">{question.askedBy}</span> {metadata}
+            <span className="asked-by">{question.asked_by}</span> {metadata}
         </div>
     );
 }

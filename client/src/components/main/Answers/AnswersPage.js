@@ -6,32 +6,33 @@ import AnswerCardTiming from "./AnswerCardTiming";
 import AnswerForm from "../answerForm/answerForm";
 import formatQuestionText from "../utils";
 
-export default function AnswersPage({ question}) {
+export default function AnswersPage({question}) {
     const [answers, setAnswers] = useState([]);
     const [views, setViews] = useState([]);
     const [showAnswerForm, setShowAnswerForm] = useState(false);
 
+    console.log("question: ", question)
     function updateSortedAnswers() {
-        const answers = dataModel.getQuestionAnswers(question.qid);
-        const sortedAnswersArray = [...answers].sort((a, b) => b.ansDate - a.ansDate);
+        // const answers = dataModel.getQuestionAnswers(question.qid);
+        const sortedAnswersArray = [...question.answers].sort((a, b) => b.ansDate - a.ansDate);
         setAnswers(sortedAnswersArray);
     }
 
     useEffect(() => {
         // Increment views when the component is mounted
-        question.incrementViews(question.qid);
+        // question.incrementViews(question._id);
         setViews(question.views);
 
         // Get answers using DataModel's getQuestionAnswers method
         updateSortedAnswers();
-    }, [question.qid]);
+    }, [question._id]);
 
     const handleAnswerQuestion = () => {
         setShowAnswerForm(true);
     };
 
     const handleFormSubmit = (formData) => {
-        dataModel.addAnswer(question.qid, formData);
+        dataModel.addAnswer(question._id, formData);
         updateSortedAnswers();
         setShowAnswerForm(false);
     };
@@ -41,7 +42,7 @@ export default function AnswersPage({ question}) {
             {!showAnswerForm ? (
                 <>
                     <div className="header-container">
-                        <h3>{question.ansIds.length} answers</h3>
+                        <h3>{question.answers.length} answers</h3>
                         <h3>{question.title}</h3>
                         <h3> </h3>
                     </div>
