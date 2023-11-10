@@ -6,11 +6,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+let bodyParser = require('body-parser');
 
 // Import schemas
 const Tag = require('./models/tags');
 const Answer = require('./models/answers');
 const Question = require('./models/questions');
+
+// Import Route Methods
+const home_function = require('./routes/home')
+const all_questions_function = require('./routes/all_questions')
+const questions_function = require('./routes/questions')
+const tags_function = require('./routes/tags')
+const answers_function = require('./routes/answers')
 
 async function tagCreate(name) {
     try {
@@ -60,48 +68,43 @@ const mongoDB = 'mongodb://127.0.0.1:27017/fake_so';
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.on('connected', function() {
+    console.log('Connected to database');
+});
 
 // Configure CORS/Express
 app.use(cors());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(express.json());
+
+/*
+Method that returns homepage message
+ */
+app.get('/', async (req, res) => {
+    await home_function.home(res);
+});
 
 /*
 Method that returns everything
  */
 app.get('/questions/all', async (req, res) => {
-    try {
-        const questions = await Question.find().populate('tags answers');
-        res.json(questions);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error getting all questions, tags, and answers' });
-    }
+    await all_questions_function.allQuestions(res)
 });
 
 /*
 Method that returns all questions and associated fields
  */
 app.get('/questions', async (req, res) => {
-    try {
-        const questions = await Question.find();
-        res.json(questions);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error getting all questions' });
-    }
+    await questions_function.questions(res)
 });
 
 /*
 Method that returns all tags and their IDs
  */
 app.get('/tags', async (req, res) => {
-    try {
-        const tags = await Tag.find();
-        res.json(tags);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error getting tags' });
-    }
+    await tags_function.tags(res)
 });
 
 /*
@@ -109,28 +112,7 @@ Method that returns the answers to a given question
  */
 app.get('/questions/:questionId/answers', async (req, res) => {
     const { questionId } = req.params;
-    try {
-        const question = await Question.findById(questionId);
-        if (!question) {
-            return res.status(404).json({ error: 'Question not found' });
-        }
-        const answers = await Answer.find({ _id: { $in: question.answers } });
-        res.json(answers);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error getting answers to question' });
-    }
-});
-
-/*
-Method that returns homepage message
- */
-app.get('/', async (req, res) => {
-    try {
-        res.json({"message":"Welcome to FSO!"});
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+    await answers_function.answers(res, questionId)
 });
 
 /*
