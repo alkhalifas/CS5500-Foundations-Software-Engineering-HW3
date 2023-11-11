@@ -41,7 +41,7 @@ async function tagCreate(name) {
 
 exports.post_question = async function (res) {
     // Normalize tags to lowercase for case-insensitivity to avoid react being the same as REACT
-    const normalizedTags = tags.map(tag => tag.toLowerCase());
+    const normalizedTags = tagNames.map(tag => tag.toLowerCase());
 
     try {
         const tagIds = [];
@@ -60,7 +60,7 @@ exports.post_question = async function (res) {
         }
 
         // Create the question with the tag IDs
-        const newQuestion = await questionCreate(title, text, tagIds, [], 'Anonymous', new Date(), 0);
+        const newQuestion = await questionCreate(title, text, tagIds, [], askedBy, new Date(), 0);
 
         res.status(201).json(newQuestion);
     } catch (error) {

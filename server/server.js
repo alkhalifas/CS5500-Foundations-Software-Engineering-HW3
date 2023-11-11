@@ -80,7 +80,7 @@ app.get('/questions/:questionId/answers', async (req, res) => {
 Method that posts a new question
  */
 app.post('/questions', async (req, res) => {
-    const { title, text, tags } = req.body;
+    const { title, text, tagNames, askedBy } = req.body;
     await post_question_function.post_question(res, title, text, tags)
 });
 
@@ -114,6 +114,26 @@ Method that increments views by 1
 app.post('/questions/increment-views/:questionId', async (req, res) => {
     const { questionId } = req.params;
     await post_increment_question_view_function.post_increment_question_view(res, questionId)
+});
+
+/*
+Method that returns tagName for a given tag id
+ */
+app.get('/tags/tag-id/:tagId', async (req, res) => {
+    const { tagId } = req.params;
+
+    try {
+        const tag = await Tag.findById(tagId);
+
+        if (!tag) {
+            return res.status(404).json({ error: 'Tag not found' });
+        }
+
+        res.json(tag.name);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error getting questions for tag' });
+    }
 });
 
 // Display the specified message when disconnected
