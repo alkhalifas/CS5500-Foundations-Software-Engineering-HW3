@@ -6,9 +6,28 @@ Read homework specifications [here](https://northeastern-my.sharepoint.com/:w:/r
 In the sections below, list and describe each contribution briefly.
 
 ## Team Member 1 Contribution
+- [X] Schemas
+- [X] Populate Integration
+- [X] Server API Routes
+- [X] Server Requirements
+- [X] Tags Page
+- [ ] Questions Per Tag Page
 
 ## Team Member 2 Contribution
+- [ ] Questions List
+- [ ] Search 
+- [ ] Create Question
+- [ ] Answer Question
+- [ ] Questions List
 
 *Add your team's class and sequence diagrams to the design directory*. It is enough to document the design of the server. You can assume the client to be an external entity that will trigger events in the server.
 
 You will get 10% extra credit if you implement design patterns and explain how you have used them in this README.
+
+## Steps to Run:
+
+    # Start Mongod
+    mongod --config /opt/homebrew/etc/mongod.conf --fork
+
+    # Populate the Database
+    node populate_db.js mongodb://127.0.0.1:27017/fake_so
