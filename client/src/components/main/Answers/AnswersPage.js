@@ -12,7 +12,6 @@ export default function AnswersPage({question}) {
     const [views, setViews] = useState([]);
     const [showAnswerForm, setShowAnswerForm] = useState(false);
 
-    console.log("question: ", question)
     function updateSortedAnswers() {
         // const answers = dataModel.getQuestionAnswers(question.qid);
         const sortedAnswersArray = [...question.answers].sort((a, b) => b.ansDate - a.ansDate);
@@ -21,23 +20,25 @@ export default function AnswersPage({question}) {
 
     useEffect(() => {
         // Increment views when the component is mounted
-        // question.incrementViews(question._id);
-        setViews(question.views+1);
-
-        const apiUrl = `http://localhost:8000/questions/increment-views/${question._id}`;
-
-        axios.post(apiUrl)
+        const viewUrl = `http://localhost:8000/questions/increment-views/${question._id}`;
+        axios.post(viewUrl)
             .then(response => {
-                console.log("increment-views: ", response.data)
+                setViews(question.views);
             })
             .catch(error => {
-                console.error('Error fetching questions:', error);
+                console.error('Error incrementing views:', error);
             });
 
-
-
-        // Get answers using DataModel's getQuestionAnswers method
-        updateSortedAnswers();
+        const answerUrl = `http://localhost:8000/questions/${question._id}/answers`;
+        axios.get(answerUrl)
+            .then(response => {
+                //const answers = response.data;
+                //const sortedAnswersArray = [...question.answers].sort((a, b) => b.ansDate - a.ansDate);
+                setAnswers(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching answers:', error);
+            });
     }, [question._id]);
 
     const handleAnswerQuestion = () => {

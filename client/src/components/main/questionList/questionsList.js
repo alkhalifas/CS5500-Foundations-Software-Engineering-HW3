@@ -5,28 +5,77 @@ import "./questionList.css"
 import AnswersPage from "../Answers/AnswersPage";
 import QuestionCardTiming from "./QuestionCardTiming";
 import formatQuestionText from "../utils"
+import axios from "axios";
 
 export default function QuestionsList() {
     const [showForm, setShowForm] = useState(false);
     const [selectedQuestion, setSelectedQuestion] = useState(null);
-    const [sortedQuestions, setSortedQuestions] = useState(dataModel.getAllQuestions());
+    const [sortedQuestions, setSortedQuestions] = useState([]);
+    const [tagNames, setTagNames] = useState({});
 
     function updateSortedQuestions() {
-      const questions = dataModel.getAllQuestions();
-      const sortedQuestionsArray = [...questions].sort((a, b) => b.askDate - a.askDate);
-      setSortedQuestions(sortedQuestionsArray);
+        const apiUrl = `http://localhost:8000/questions`;
+        axios.get(apiUrl)
+            .then(response => {
+                //const questions = response.data;
+                //const sortedQuestionsArray = [...questions].sort((a, b) => b.askDate - a.askDate);
+                setSortedQuestions(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching questions:', error);
+            });
+    }
+
+    function fetchTagNames() {
+        const tagNamesPromises = [];
+        for (const question of sortedQuestions) {
+            for (const tag of question.tags) {
+                if (!tagNames[tag]) {
+                    const apiUrl = `http://localhost:8000/tags/tag-id/${tag}`;
+                    const tagPromise = axios.get(apiUrl)
+                        .then(response => {
+                            return { tag, name: response.data };
+                        })
+                        .catch(error => {
+                            console.error('Error fetching tag name:', error);
+                            return { tag, name: null };
+                        });
+                    tagNamesPromises.push(tagPromise);
+                }
+            }
+        }
+        Promise.all(tagNamesPromises)
+            .then(results => {
+                const tagNamesMap = {};
+                results.forEach(result => {
+                    tagNamesMap[result.tag] = result.name;
+                });
+
+                setTagNames(tagNamesMap);
+            });
     }
 
     useEffect(() => {
         updateSortedQuestions();
     }, []);
 
+    useEffect(() => {
+        fetchTagNames();
+    }, [sortedQuestions]); // Fetch tag names whenever sortedQuestions changes
+
     const handleAskQuestion = () => {
         setShowForm(true);
     };
 
     const handleFormSubmit = (formData) => {
-        dataModel.addQuestion(formData);
+//        const apiUrl = `http://localhost:8000/questions`;
+//        axios.post(apiUrl, formData)
+//            .then(response => {
+//                console.log('Question added successfully:', response.data);
+//            })
+//            .catch(error => {
+//                console.error('Error adding question:', error);
+//            });
         updateSortedQuestions();
         setShowForm(false);
     };
@@ -116,8 +165,8 @@ export default function QuestionsList() {
                                         </h4>
                                         <p style={{"fontSize":"12px"}} dangerouslySetInnerHTML={formatQuestionText(question.text)} />
                                         <div className="tags">
-                                            {question.getTagsWithNames(dataModel.tags).map(tag => (
-                                                <span key={tag.id} className="badge">{tag.name}</span>
+                                            {question.tags.map(tag => (
+                                                <span key={tag} className="badge">{tagNames[tag]}</span>
                                             ))}
                                         </div>
                                     </div>
