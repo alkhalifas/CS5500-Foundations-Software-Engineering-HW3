@@ -5,6 +5,7 @@ import dataModel from "../../../models/datamodel";
 import AnswerCardTiming from "./AnswerCardTiming";
 import AnswerForm from "../answerForm/answerForm";
 import formatQuestionText from "../utils";
+import axios from "axios";
 
 export default function AnswersPage({question}) {
     const [answers, setAnswers] = useState([]);
@@ -21,7 +22,19 @@ export default function AnswersPage({question}) {
     useEffect(() => {
         // Increment views when the component is mounted
         // question.incrementViews(question._id);
-        setViews(question.views);
+        setViews(question.views+1);
+
+        const apiUrl = `http://localhost:8000/questions/increment-views/${question._id}`;
+
+        axios.post(apiUrl)
+            .then(response => {
+                console.log("increment-views: ", response.data)
+            })
+            .catch(error => {
+                console.error('Error fetching questions:', error);
+            });
+
+
 
         // Get answers using DataModel's getQuestionAnswers method
         updateSortedAnswers();
