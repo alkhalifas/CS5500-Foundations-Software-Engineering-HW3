@@ -9,6 +9,7 @@ In the sections below, list and describe each contribution briefly.
 - [X] Schemas
 - [X] Populate Integration
 - [X] Server API Routes
+- [X] MongoDB Integration
 - [X] Server Requirements
 - [X] Tags Page
 - [ ] Questions Per Tag Page
