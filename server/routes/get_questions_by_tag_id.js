@@ -1,6 +1,6 @@
 const Tag = require("../models/tags");
 const Question = require("../models/questions");
-exports.get_questions_by_tag_id = async function (res, tagName) {
+exports.get_questions_by_tag_id = async function (res, tagId) {
     try {
         const tag = await Tag.findById(tagId);
 

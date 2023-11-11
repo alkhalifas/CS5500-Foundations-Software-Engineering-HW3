@@ -8,11 +8,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 let bodyParser = require('body-parser');
 
-// Import schemas
-const Tag = require('./models/tags');
-const Answer = require('./models/answers');
-const Question = require('./models/questions');
-
 // Import Route Methods
 const home_function = require('./routes/get_home')
 const all_questions_function = require('./routes/all_questions')
@@ -23,45 +18,7 @@ const post_question_function = require('./routes/post_question')
 const get_questions_by_tag_name_function = require("./routes/get_questions_by_tag_name");
 const get_questions_by_tag_id_function = require("./routes/get_questions_by_tag_id");
 const get_tags_with_count_function = require("./routes/get_tags_with_count");
-
-async function tagCreate(name) {
-    try {
-        let tag = await Tag.findOne({ name: name.toLowerCase() });
-
-        if (!tag) {
-            // Create a new tag if it doesn't exist
-            tag = new Tag({ name: name.toLowerCase() });
-            await tag.save();
-        }
-
-        return tag;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
-
-
-async function questionCreate(title, text, tags, answers, asked_by, ask_date_time, views) {
-    try {
-        const tempQuestion = {
-            title: title,
-            text: text,
-            tags: tags,
-            asked_by: asked_by,
-            answers: answers,
-            ask_date_time: ask_date_time,
-            views: views,
-        };
-
-        const qstn = new Question(tempQuestion);
-        await qstn.save();
-        return qstn;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
+const post_increment_question_view_function = require("./routes/post_increment_question_view")
 
 // Provision App
 const app = express();
@@ -156,30 +113,10 @@ Method that increments views by 1
  */
 app.post('/questions/increment-views/:questionId', async (req, res) => {
     const { questionId } = req.params;
-
-    try {
-        // Find the question by Id
-        // const question = await Question.findById(questionId);
-        const question = await Question.findById(questionId);
-
-        if (!question) {
-            return res.status(404).json({ error: 'Question not found' });
-        }
-
-        // Increment view by 1
-        question.views += 1;
-
-        // Save it
-        await question.save();
-
-        res.json(question);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error incrementing views' });
-    }
+    await post_increment_question_view_function.post_increment_question_view(res, questionId)
 });
 
-// Display message when disconnected
+// Display the specified message when disconnected
 process.on('SIGINT', () => {
     mongoose.connection.close()
         .then(() => {
@@ -192,7 +129,7 @@ process.on('SIGINT', () => {
         });
 });
 
-// Display message when starting
+// Display specified  message when starting
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
