@@ -14,11 +14,15 @@ const Answer = require('./models/answers');
 const Question = require('./models/questions');
 
 // Import Route Methods
-const home_function = require('./routes/home')
+const home_function = require('./routes/get_home')
 const all_questions_function = require('./routes/all_questions')
-const questions_function = require('./routes/questions')
-const tags_function = require('./routes/tags')
-const answers_function = require('./routes/answers')
+const questions_function = require('./routes/get_questions')
+const tags_function = require('./routes/get_tags')
+const answers_function = require('./routes/get_answers')
+const post_question_function = require('./routes/post_question')
+const get_questions_by_tag_name_function = require("./routes/get_questions_by_tag_name");
+const get_questions_by_tag_id_function = require("./routes/get_questions_by_tag_id");
+const get_tags_with_count_function = require("./routes/get_tags_with_count");
 
 async function tagCreate(name) {
     try {
@@ -120,57 +124,15 @@ Method that posts a new question
  */
 app.post('/questions', async (req, res) => {
     const { title, text, tags } = req.body;
-
-    // Normalize tags to lowercase for case-insensitivity to avoid react being the same as REACT
-    const normalizedTags = tags.map(tag => tag.toLowerCase());
-
-    try {
-        const tagIds = [];
-
-        // Check if each tag exists or create it if it doesn't
-        for (const tagText of normalizedTags) {
-            // Chek if exists
-            let existingTag = await Tag.findOne({ name: tagText });
-            // If does not exist
-            if (!existingTag) {
-                // Create a new tag if it doesn't exist
-                existingTag = await tagCreate(tagText);
-            }
-            // Add tag
-            tagIds.push(existingTag._id);
-        }
-
-        // Create the question with the tag IDs
-        const newQuestion = await questionCreate(title, text, tagIds, [], 'Anonymous', new Date(), 0);
-
-        res.status(201).json(newQuestion);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error adding new question' });
-    }
+    await post_question_function.post_question(res, title, text, tags)
 });
 
 /*
 Method that gets questions for a given tag
  */
-// Define a route to get all questions related to a specific tag
 app.get('/questions/tag/:tagName', async (req, res) => {
     const { tagName } = req.params;
-
-    try {
-        const tag = await Tag.findOne({ name: tagName.toLowerCase() });
-
-        if (!tag) {
-            return res.status(404).json({ error: 'Tag not found' });
-        }
-
-        const questions = await Question.find({ tags: tag._id }).populate('tags answers');
-
-        res.json(questions);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error getting questions for tag' });
-    }
+    await get_questions_by_tag_name_function.get_questions_by_tag_name(res, tagName)
 });
 
 /*
@@ -178,57 +140,15 @@ Method that returns questions for a given tan id
  */
 app.get('/questions/tag-id/:tagId', async (req, res) => {
     const { tagId } = req.params;
-
-    try {
-        const tag = await Tag.findById(tagId);
-
-        if (!tag) {
-            return res.status(404).json({ error: 'Tag not found' });
-        }
-
-        const questions = await Question.find({ tags: tag._id }).populate('tags answers');
-
-        res.json(questions);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error getting questions for tag' });
-    }
+    await get_questions_by_tag_id_function.get_questions_by_tag_id(res, tagId);
 });
 
 
 /*
-Method that
+Method that gets tag with teg count
  */
 app.get('/tags-with-count', async (req, res) => {
-    try {
-        const tagCounts = await Question.aggregate([
-            {
-                $unwind: '$tags',
-            },
-            {
-                $group: {
-                    _id: '$tags',
-                    count: { $sum: 1 },
-                },
-            },
-        ]);
-
-        const tagsWithCount = await Promise.all(
-            tagCounts.map(async (tagCount) => {
-                const tag = await Tag.findById(tagCount._id);
-                return {
-                    _id: tagCount._id,
-                    name: tag ? tag.name : 'Unknown',
-                    count: tagCount.count,
-                };
-            })
-        );
-
-        res.json(tagsWithCount);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error getting tags with counts' });
-    }
+    await get_tags_with_count_function.get_tags_with_count(res);
 });
 
 /*
