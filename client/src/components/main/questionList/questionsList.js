@@ -68,15 +68,16 @@ export default function QuestionsList() {
     };
 
     const handleFormSubmit = (formData) => {
-//        const apiUrl = `http://localhost:8000/questions`;
-//        axios.post(apiUrl, formData)
-//            .then(response => {
-//                console.log('Question added successfully:', response.data);
-//            })
-//            .catch(error => {
-//                console.error('Error adding question:', error);
-//            });
-        updateSortedQuestions();
+        const apiUrl = `http://localhost:8000/questions`;
+        axios.post(apiUrl, formData)
+            .then(response => {
+                console.log('Question added successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error adding question:', error);
+            });
+        //fetchTagNames();
+        //updateSortedQuestions();
         setShowForm(false);
     };
 
@@ -88,7 +89,7 @@ export default function QuestionsList() {
         let sortedQuestionsArray = [...dataModel.getAllQuestions()];
 
         if (sortType === 'newest') {
-            sortedQuestionsArray.sort((a, b) => b.askDate - a.askDate);
+            sortedQuestionsArray.sort((a, b) => b.ask_date_time - a.ask_date_time); // ask_date_time not askDate //Pending
         } else if (sortType === 'active') {
             sortedQuestionsArray.sort((a, b) => {
                 const aAnswers = dataModel.getQuestionAnswers(a.qid);
@@ -113,7 +114,6 @@ export default function QuestionsList() {
                 (question) => dataModel.getQuestionAnswers(question.qid).length === 0
             );
         }
-
         setSortedQuestions(sortedQuestionsArray);
     };
 

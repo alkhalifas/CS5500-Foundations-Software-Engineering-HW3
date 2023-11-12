@@ -23,7 +23,7 @@ export default function AnswersPage({question}) {
         const viewUrl = `http://localhost:8000/questions/increment-views/${question._id}`;
         axios.post(viewUrl)
             .then(response => {
-                setViews(question.views);
+                setViews(question.views + 1);
             })
             .catch(error => {
                 console.error('Error incrementing views:', error);

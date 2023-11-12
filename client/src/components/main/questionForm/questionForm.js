@@ -6,8 +6,8 @@ export default function QuestionForm({ onSubmit }) {
     const initialFormData = {
         title: '',
         text: '',
-        tagNames: '',
-        askedBy: '',
+        tags: '',
+        asked_by: '',
     };
 
     const [formData, setFormData] = useState(initialFormData);
@@ -60,24 +60,24 @@ export default function QuestionForm({ onSubmit }) {
         }
 
         // Tags validation
-        if (!data.tagNames.trim()) {
-            errors.tagNames = "Tags cannot be empty";
+        if (!data.tags.trim()) {
+            errors.tags = "Tags cannot be empty";
         }
 
-        const tags = data.tagNames.trim().split(/\s+/);
-        if (tags.length > 5) {
-            errors.tagNames = "Cannot have more than 5 tags";
+        const tagNames = data.tags.trim().split(/\s+/);
+        if (tagNames.length > 5) {
+            errors.tags = "Cannot have more than 5 tags";
         }
-        for (const tag of tags) {
+        for (const tag of tagNames) {
             if (tag.length > 20) {
-                errors.tagNames = "New tag length cannot be more than 20";
+                errors.tags = "New tag length cannot be more than 20";
                 break;
             }
         }
 
         // Username validation
-        if (!data.askedBy.trim()) {
-            errors.askedBy = "Username cannot be empty";
+        if (!data.asked_by.trim()) {
+            errors.asked_by = "Username cannot be empty";
         }
 
         return errors;
@@ -118,14 +118,14 @@ export default function QuestionForm({ onSubmit }) {
                 <input
                     type="text"
                     id="formTagInput"
-                    name="tagNames"
-                    value={formData.tagNames}
+                    name="tags"
+                    value={formData.tags}
                     onChange={handleInputChange}
                     placeholder="Add keywords separated by whitespace"
                     //required
                 />
-                {validationErrors.tagNames && (
-                    <div className="error-message">{validationErrors.tagNames}</div>
+                {validationErrors.tags && (
+                    <div className="error-message">{validationErrors.tags}</div>
                 )}
             </label>
             <label>
@@ -133,13 +133,13 @@ export default function QuestionForm({ onSubmit }) {
                 <input
                     type="text"
                     id="formUsernameInput"
-                    name="askedBy"
-                    value={formData.askedBy}
+                    name="asked_by"
+                    value={formData.asked_by}
                     onChange={handleInputChange}
                     placeholder="Add username"
                 />
-                {validationErrors.askedBy && (
-                    <div className="error-message">{validationErrors.askedBy}</div>
+                {validationErrors.asked_by && (
+                    <div className="error-message">{validationErrors.asked_by}</div>
                 )}
             </label>
 
