@@ -12,9 +12,14 @@ export default function AnswersPage({question}) {
     const [showAnswerForm, setShowAnswerForm] = useState(false);
 
     function updateSortedAnswers() {
-        // const answers = dataModel.getQuestionAnswers(question.qid);
-        const sortedAnswersArray = [...question.answers].sort((a, b) => b.ansDate - a.ansDate);
-        setAnswers(sortedAnswersArray);
+        const answerUrl = `http://localhost:8000/questions/${question._id}/answers`; // Sort in Newest order - Pending
+        axios.get(answerUrl)
+            .then(response => {
+                setAnswers(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching answers:', error);
+            });
     }
 
     useEffect(() => {
@@ -28,33 +33,26 @@ export default function AnswersPage({question}) {
                 console.error('Error incrementing views:', error);
             });
 
-        const answerUrl = `http://localhost:8000/questions/${question._id}/answers`;
-        axios.get(answerUrl)
-            .then(response => {
-                //const answers = response.data;
-                //const sortedAnswersArray = [...question.answers].sort((a, b) => b.ansDate - a.ansDate);
-                setAnswers(response.data);
-            })
-            .catch(error => {
-                console.error('Error fetching answers:', error);
-            });
+        updateSortedAnswers()
+
     }, [question._id]);
 
     const handleAnswerQuestion = () => {
         setShowAnswerForm(true);
     };
 
-    const handleFormSubmit = (formData) => {
+    const handleFormSubmit = async (formData) => {
         const apiUrl = `http://localhost:8000/questions/${question._id}/answers`;
-        axios.post(apiUrl, formData)
-            .then(response => {
-                console.log('Answer added successfully:', response.data);
-            })
-            .catch(error => {
-                console.error('Error adding answer:', error);
-            });
-        //updateSortedAnswers();
-        setShowAnswerForm(false);
+
+        try {
+            const response = await axios.post(apiUrl, formData);
+            console.log('Answer added successfully:', response.data);
+
+            await updateSortedAnswers();
+            setShowAnswerForm(false);
+        } catch (error) {
+            console.error('Error adding answer:', error);
+        }
     };
 
     return (
@@ -74,7 +72,7 @@ export default function AnswersPage({question}) {
                             <p style={{"fontSize":"12px"}} dangerouslySetInnerHTML={formatQuestionText(question.text)} />
                         </div>
                         <div className="asked-by-column">
-                            <span className="asked-data"><QuestionCardTiming question={question} /></span>
+                            <span className="asked-data"><QuestionCardTiming question={question} /></span> // Incorrect time - Pending
                         </div>
                     </div>
                     <div className="dotted-line" />

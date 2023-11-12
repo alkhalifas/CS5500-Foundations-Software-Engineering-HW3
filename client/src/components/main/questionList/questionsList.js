@@ -14,11 +14,9 @@ export default function QuestionsList() {
     const [tagNames, setTagNames] = useState({});
 
     function updateSortedQuestions() {
-        const apiUrl = `http://localhost:8000/questions`;
+        const apiUrl = `http://localhost:8000/questions`; // Sort in Newest order - Pending
         axios.get(apiUrl)
             .then(response => {
-                //const questions = response.data;
-                //const sortedQuestionsArray = [...questions].sort((a, b) => b.askDate - a.askDate);
                 setSortedQuestions(response.data);
             })
             .catch(error => {
@@ -67,29 +65,31 @@ export default function QuestionsList() {
         setShowForm(true);
     };
 
-    const handleFormSubmit = (formData) => {
+    const handleFormSubmit = async (formData) => {
         const apiUrl = `http://localhost:8000/questions`;
-        axios.post(apiUrl, formData)
-            .then(response => {
-                console.log('Question added successfully:', response.data);
-            })
-            .catch(error => {
-                console.error('Error adding question:', error);
-            });
-        fetchTagNames();
-        updateSortedQuestions();
-        setShowForm(false);
+
+        try {
+            const response = await axios.post(apiUrl, formData);
+            console.log('Question added successfully:', response.data);
+
+            await fetchTagNames();
+            await updateSortedQuestions();
+
+            setShowForm(false);
+        } catch (error) {
+            console.error('Error adding question:', error);
+        }
     };
 
     const handleQuestionClick = (question) => {
         setSelectedQuestion(question);
     };
 
-    const handleSort = (sortType) => {
+    const handleSort = (sortType) => { // Pending
         let sortedQuestionsArray = [...dataModel.getAllQuestions()];
 
         if (sortType === 'newest') {
-            sortedQuestionsArray.sort((a, b) => b.ask_date_time - a.ask_date_time); // ask_date_time not askDate //Pending
+            sortedQuestionsArray.sort((a, b) => b.ask_date_time - a.ask_date_time); // ask_date_time not askDate
         } else if (sortType === 'active') {
             sortedQuestionsArray.sort((a, b) => {
                 const aAnswers = dataModel.getQuestionAnswers(a.qid);
