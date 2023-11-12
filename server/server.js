@@ -20,6 +20,7 @@ const get_questions_by_tag_id_function = require("./routes/get_questions_by_tag_
 const get_tags_with_count_function = require("./routes/get_tags_with_count");
 const post_increment_question_view_function = require("./routes/post_increment_question_view")
 const get_tag_name_by_tag_id_function = require("./routes/get_tag_name_by_tag_id");
+const post_answer_function = require("./routes/post_answer");
 
 // Provision App
 const app = express();
@@ -83,6 +84,15 @@ Method that posts a new question
 app.post('/questions', async (req, res) => {
     const { title, text, tags, asked_by } = req.body;
     await post_question_function.post_question(res, title, text, tags, asked_by)
+});
+
+/*
+Method that posts a new answer to a given question
+ */
+app.post('/questions/:questionId/answers', async (req, res) => {
+    const { questionId } = req.params;
+    const { text, ans_by } = req.body;
+    await post_answer_function.post_answer(res, questionId, text, ans_by)
 });
 
 /*
