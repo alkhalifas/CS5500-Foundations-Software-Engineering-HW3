@@ -76,8 +76,8 @@ export default function QuestionsList() {
             .catch(error => {
                 console.error('Error adding question:', error);
             });
-        //fetchTagNames();
-        //updateSortedQuestions();
+        fetchTagNames();
+        updateSortedQuestions();
         setShowForm(false);
     };
 

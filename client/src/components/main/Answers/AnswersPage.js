@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import "./AnswersPage.css"
 import QuestionCardTiming from "../questionList/QuestionCardTiming.js"
-import dataModel from "../../../models/datamodel";
 import AnswerCardTiming from "./AnswerCardTiming";
 import AnswerForm from "../answerForm/answerForm";
 import formatQuestionText from "../utils";
@@ -46,8 +45,15 @@ export default function AnswersPage({question}) {
     };
 
     const handleFormSubmit = (formData) => {
-        dataModel.addAnswer(question._id, formData);
-        updateSortedAnswers();
+        const apiUrl = `http://localhost:8000/questions/${question._id}/answers`;
+        axios.post(apiUrl, formData)
+            .then(response => {
+                console.log('Answer added successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error adding answer:', error);
+            });
+        //updateSortedAnswers();
         setShowAnswerForm(false);
     };
 

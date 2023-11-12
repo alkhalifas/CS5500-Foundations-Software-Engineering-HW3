@@ -65,7 +65,7 @@ export default function AnswerForm({ onSubmit }) {
                 <input
                     type="text"
                     id="answerUsernameInput"
-                    name="ansBy"
+                    name="ans_by"
                     value={formData.ans_by}
                     onChange={handleInputChange}
                     placeholder="Add username"
