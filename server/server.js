@@ -9,16 +9,17 @@ const cors = require('cors');
 let bodyParser = require('body-parser');
 
 // Import Route Methods
-const home_function = require('./routes/get_home')
-const all_questions_function = require('./routes/all_questions')
-const questions_function = require('./routes/get_questions')
-const tags_function = require('./routes/get_tags')
-const answers_function = require('./routes/get_answers')
-const post_question_function = require('./routes/post_question')
+const home_function = require("./routes/get_home");
+const all_questions_function = require("./routes/all_questions");
+const questions_function = require("./routes/get_questions");
+const tags_function = require("./routes/get_tags");
+const answers_function = require("./routes/get_answers");
+const post_question_function = require("./routes/post_question");
 const get_questions_by_tag_name_function = require("./routes/get_questions_by_tag_name");
 const get_questions_by_tag_id_function = require("./routes/get_questions_by_tag_id");
 const get_tags_with_count_function = require("./routes/get_tags_with_count");
 const post_increment_question_view_function = require("./routes/post_increment_question_view")
+const get_tag_name_by_tag_id_function = require("./routes/get_tag_name_by_tag_id");
 
 // Provision App
 const app = express();
@@ -80,8 +81,8 @@ app.get('/questions/:questionId/answers', async (req, res) => {
 Method that posts a new question
  */
 app.post('/questions', async (req, res) => {
-    const { title, text, tagNames, askedBy } = req.body;
-    await post_question_function.post_question(res, title, text, tags)
+    const { title, text, tags, asked_by } = req.body;
+    await post_question_function.post_question(res, title, text, tags, asked_by)
 });
 
 /*
@@ -121,19 +122,7 @@ Method that returns tagName for a given tag id
  */
 app.get('/tags/tag-id/:tagId', async (req, res) => {
     const { tagId } = req.params;
-
-    try {
-        const tag = await Tag.findById(tagId);
-
-        if (!tag) {
-            return res.status(404).json({ error: 'Tag not found' });
-        }
-
-        res.json(tag.name);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error getting questions for tag' });
-    }
+    await get_tag_name_by_tag_id_function.get_tag_name_by_tag_id(res, tagId);
 });
 
 // Display the specified message when disconnected
