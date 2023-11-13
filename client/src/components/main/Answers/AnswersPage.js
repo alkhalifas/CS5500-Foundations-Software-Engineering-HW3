@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import "./AnswersPage.css"
 import QuestionCardTiming from "../questionList/QuestionCardTiming.js"
 import AnswerCardTiming from "./AnswerCardTiming";
@@ -11,7 +11,7 @@ export default function AnswersPage({question}) {
     const [views, setViews] = useState([]);
     const [showAnswerForm, setShowAnswerForm] = useState(false);
 
-    function updateSortedAnswers() {
+    const updateSortedAnswers = useCallback(() => {
         const answerUrl = `http://localhost:8000/questions/${question._id}/answers`;
         axios.get(answerUrl)
             .then(response => {
@@ -20,7 +20,7 @@ export default function AnswersPage({question}) {
             .catch(error => {
                 console.error('Error fetching answers:', error);
             });
-    }
+    }, [question._id]);
 
     useEffect(() => {
         // Increment views when the component is mounted
@@ -35,7 +35,7 @@ export default function AnswersPage({question}) {
 
         updateSortedAnswers()
 
-    }, [question._id]);
+    }, [question._id, question.views, updateSortedAnswers]);
 
     const handleAnswerQuestion = () => {
         setShowAnswerForm(true);

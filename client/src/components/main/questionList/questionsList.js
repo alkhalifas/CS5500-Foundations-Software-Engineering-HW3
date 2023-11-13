@@ -23,42 +23,55 @@ export default function QuestionsList() {
             });
     }
 
-    function fetchTagNames() {
-        const tagNamesPromises = [];
-        for (const question of sortedQuestions) {
-            for (const tag of question.tags) {
-                if (!tagNames[tag]) {
-                    const apiUrl = `http://localhost:8000/tags/tag-id/${tag}`;
-                    const tagPromise = axios.get(apiUrl)
-                        .then(response => {
-                            return { tag, name: response.data };
-                        })
-                        .catch(error => {
-                            console.error('Error fetching tag name:', error);
-                            return { tag, name: null };
-                        });
-                    tagNamesPromises.push(tagPromise);
-                }
-            }
-        }
-        Promise.all(tagNamesPromises)
-            .then(results => {
-                const tagNamesMap = {};
-                results.forEach(result => {
-                    tagNamesMap[result.tag] = result.name;
-                });
-
-                setTagNames(tagNamesMap);
-            });
-    }
-
     useEffect(() => {
         updateSortedQuestions();
     }, []);
 
     useEffect(() => {
+        let isMounted = true;
+
+        const fetchTagNames = async () => {
+            const tagNamesPromises = [];
+            for (const question of sortedQuestions) {
+                for (const tag of question.tags) {
+                    if (!tagNames[tag]) {
+                        const apiUrl = `http://localhost:8000/tags/tag-id/${tag}`;
+                        const tagPromise = axios.get(apiUrl)
+                            .then(response => {
+                                return { tag, name: response.data };
+                            })
+                            .catch(error => {
+                                console.error('Error fetching tag name:', error);
+                                return { tag, name: null };
+                            });
+                        tagNamesPromises.push(tagPromise);
+                    }
+                }
+            }
+
+            try {
+                const results = await Promise.all(tagNamesPromises);
+
+                if (isMounted) {
+                    setTagNames(prevTagNames => {
+                        const tagNamesMap = { ...prevTagNames };
+                        results.forEach(result => {
+                            tagNamesMap[result.tag] = result.name;
+                        });
+                        return tagNamesMap;
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching tag names:', error);
+            }
+        };
+
         fetchTagNames();
-    }, [sortedQuestions]); // Fetch tag names whenever sortedQuestions changes
+
+        return () => {
+            isMounted = false;
+        };
+    }, [sortedQuestions, tagNames]);
 
     const handleAskQuestion = () => {
         setShowForm(true);
@@ -71,7 +84,6 @@ export default function QuestionsList() {
             const response = await axios.post(apiUrl, formData);
             console.log('Question added successfully:', response.data);
 
-            await fetchTagNames();
             await updateSortedQuestions();
 
             setShowForm(false);
@@ -88,7 +100,6 @@ export default function QuestionsList() {
         const apiUrl = `http://localhost:8000/questions?sort=${sortType}`;
         try {
             const response = await axios.get(apiUrl);
-            await fetchTagNames();
             setSortedQuestions(response.data);
         } catch (error) {
             console.error('Error sorting questions:', error);
@@ -102,7 +113,7 @@ export default function QuestionsList() {
             ) : selectedQuestion ? (
                 <div id={"answersHeader"}>
                     <div className="header-container">
-                        <h1></h1>
+                        <h1>All Answers</h1>
                         <button className={"ask-question-button"} onClick={handleAskQuestion}>Ask a Question</button>
                     </div>
                     <AnswersPage question={selectedQuestion} />
