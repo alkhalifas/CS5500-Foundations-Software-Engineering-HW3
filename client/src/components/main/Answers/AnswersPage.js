@@ -12,7 +12,7 @@ export default function AnswersPage({question}) {
     const [showAnswerForm, setShowAnswerForm] = useState(false);
 
     function updateSortedAnswers() {
-        const answerUrl = `http://localhost:8000/questions/${question._id}/answers`; // Sort in Newest order - Pending
+        const answerUrl = `http://localhost:8000/questions/${question._id}/answers`;
         axios.get(answerUrl)
             .then(response => {
                 setAnswers(response.data);
@@ -72,7 +72,7 @@ export default function AnswersPage({question}) {
                             <p style={{"fontSize":"12px"}} dangerouslySetInnerHTML={formatQuestionText(question.text)} />
                         </div>
                         <div className="asked-by-column">
-                            <span className="asked-data"><QuestionCardTiming question={question} /></span> // Incorrect time - Pending
+                            <span className="asked-data"><QuestionCardTiming question={question} /></span>
                         </div>
                     </div>
                     <div className="dotted-line" />

@@ -53,21 +53,22 @@ app.get('/', async (req, res) => {
 Method that returns everything
  */
 app.get('/questions/all', async (req, res) => {
-    await all_questions_function.allQuestions(res)
+    await all_questions_function.allQuestions(res);
 });
 
 /*
 Method that returns all questions and associated fields
  */
 app.get('/questions', async (req, res) => {
-    await questions_function.questions(res)
+    const sortType = req.query.sort || 'newest'; // Default to 'newest' if no sort parameter is provided
+    await questions_function.questions(res, sortType);
 });
 
 /*
 Method that returns all tags and their IDs
  */
 app.get('/tags', async (req, res) => {
-    await tags_function.tags(res)
+    await tags_function.tags(res);
 });
 
 /*
@@ -75,7 +76,7 @@ Method that returns the answers to a given question
  */
 app.get('/questions/:questionId/answers', async (req, res) => {
     const { questionId } = req.params;
-    await answers_function.answers(res, questionId)
+    await answers_function.answers(res, questionId);
 });
 
 /*
@@ -83,7 +84,7 @@ Method that posts a new question
  */
 app.post('/questions', async (req, res) => {
     const { title, text, tags, asked_by } = req.body;
-    await post_question_function.post_question(res, title, text, tags, asked_by)
+    await post_question_function.post_question(res, title, text, tags, asked_by);
 });
 
 /*
@@ -92,7 +93,7 @@ Method that posts a new answer to a given question
 app.post('/questions/:questionId/answers', async (req, res) => {
     const { questionId } = req.params;
     const { text, ans_by } = req.body;
-    await post_answer_function.post_answer(res, questionId, text, ans_by)
+    await post_answer_function.post_answer(res, questionId, text, ans_by);
 });
 
 /*
@@ -100,7 +101,7 @@ Method that gets questions for a given tag
  */
 app.get('/questions/tag/:tagName', async (req, res) => {
     const { tagName } = req.params;
-    await get_questions_by_tag_name_function.get_questions_by_tag_name(res, tagName)
+    await get_questions_by_tag_name_function.get_questions_by_tag_name(res, tagName);
 });
 
 /*
@@ -124,7 +125,7 @@ Method that increments views by 1
  */
 app.post('/questions/increment-views/:questionId', async (req, res) => {
     const { questionId } = req.params;
-    await post_increment_question_view_function.post_increment_question_view(res, questionId)
+    await post_increment_question_view_function.post_increment_question_view(res, questionId);
 });
 
 /*
