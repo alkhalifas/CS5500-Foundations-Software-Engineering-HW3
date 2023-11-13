@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import dataModel from '../../../models/datamodel';
 import QuestionForm from "../questionForm/questionForm";
 import "./questionList.css"
 import AnswersPage from "../Answers/AnswersPage";
@@ -14,7 +13,7 @@ export default function QuestionsList() {
     const [tagNames, setTagNames] = useState({});
 
     function updateSortedQuestions() {
-        const apiUrl = `http://localhost:8000/questions`; // Sort in Newest order - Pending
+        const apiUrl = `http://localhost:8000/questions`;
         axios.get(apiUrl)
             .then(response => {
                 setSortedQuestions(response.data);
@@ -85,36 +84,15 @@ export default function QuestionsList() {
         setSelectedQuestion(question);
     };
 
-    const handleSort = (sortType) => { // Pending
-        let sortedQuestionsArray = [...dataModel.getAllQuestions()];
-
-        if (sortType === 'newest') {
-            sortedQuestionsArray.sort((a, b) => b.ask_date_time - a.ask_date_time); // ask_date_time not askDate
-        } else if (sortType === 'active') {
-            sortedQuestionsArray.sort((a, b) => {
-                const aAnswers = dataModel.getQuestionAnswers(a.qid);
-                const bAnswers = dataModel.getQuestionAnswers(b.qid);
-
-                if (aAnswers.length === 0 && bAnswers.length === 0) {
-                    return b.askDate - a.askDate;
-                }
-
-                if (aAnswers.length === bAnswers.length) {
-                    const aLatestAnswerDate = aAnswers.reduce((latestDate, answer) =>
-                        Math.max(latestDate, answer.ansDate), a.askDate);
-                    const bLatestAnswerDate = bAnswers.reduce((latestDate, answer) =>
-                        Math.max(latestDate, answer.ansDate), b.askDate);
-                    return bLatestAnswerDate - aLatestAnswerDate;
-                }
-
-                return bAnswers.length - aAnswers.length;
-            });
-        } else if (sortType === 'unanswered') {
-            sortedQuestionsArray = sortedQuestionsArray.filter(
-                (question) => dataModel.getQuestionAnswers(question.qid).length === 0
-            );
+    const handleSort = async (sortType) => {
+        const apiUrl = `http://localhost:8000/questions?sort=${sortType}`;
+        try {
+            const response = await axios.get(apiUrl);
+            await fetchTagNames();
+            setSortedQuestions(response.data);
+        } catch (error) {
+            console.error('Error sorting questions:', error);
         }
-        setSortedQuestions(sortedQuestionsArray);
     };
 
     return (
@@ -156,7 +134,7 @@ export default function QuestionsList() {
                                 >
                                     <div className={"question-left postStats"}>
                                         <p>{question.views} views</p>
-                                        <p>{dataModel.getQuestionAnswers(question.qid).length} answers</p>
+                                        <p>{question.answers.length} answers</p>
                                     </div>
                                     <div className={"question-mid"}>
                                         <h4 className={"postTitle"}
