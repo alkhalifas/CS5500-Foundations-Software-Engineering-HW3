@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import QuestionCardTiming from "../questionList/QuestionCardTiming";
 import formatQuestionText from "../utils"
 import QuestionForm from "../questionForm/questionForm";
@@ -9,10 +9,6 @@ export default function SearchResultsList({ searchInput }) {
     const [showForm, setShowForm] = useState(false);
     const [selectedQuestion, setSelectedQuestion] = useState(null);
     const [searchResults, setSearchResults] = useState([]);
-
-    useEffect(() => {
-        handleSort('newest');
-    }, [searchInput]);
 
     const handleAskQuestion = () => {
         setShowForm(true);
@@ -33,15 +29,20 @@ export default function SearchResultsList({ searchInput }) {
         setSelectedQuestion(question);
     };
 
-    const handleSort = async (sortType) => {
+    const handleSort = useCallback((sortType) => {
         const apiUrl = `http://localhost:8000/questions?sort=${sortType}&searchInput=${searchInput}`;
-        try {
-            const response = await axios.get(apiUrl);
-            setSearchResults(response.data);
-        } catch (error) {
-            console.error('Error sorting search results:', error);
-        }
-    };
+        axios.get(apiUrl)
+            .then(response => {
+                setSearchResults(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching search results:', error);
+            });
+    }, [searchInput]);
+
+    useEffect(() => {
+        handleSort('newest');
+    }, [searchInput, handleSort]);
 
     return (
         <div>
