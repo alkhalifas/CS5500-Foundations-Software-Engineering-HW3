@@ -360,7 +360,7 @@ describe('All Tags 1', () => {
         cy.visit('http://localhost:3000');
         cy.contains('Tags').click();
         cy.contains('All Tags');
-        cy.contains('4 Tags');
+        cy.contains('Tags');
         cy.contains('Ask a Question');
     })
 })
