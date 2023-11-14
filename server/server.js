@@ -19,7 +19,6 @@ const get_questions_by_tag_name_function = require("./routes/get_questions_by_ta
 const get_questions_by_tag_id_function = require("./routes/get_questions_by_tag_id");
 const get_tags_with_count_function = require("./routes/get_tags_with_count");
 const post_increment_question_view_function = require("./routes/post_increment_question_view")
-const get_tag_name_by_tag_id_function = require("./routes/get_tag_name_by_tag_id");
 const post_answer_function = require("./routes/post_answer");
 
 // Provision App
@@ -61,7 +60,8 @@ Method that returns all questions and associated fields
  */
 app.get('/questions', async (req, res) => {
     const sortType = req.query.sort || 'newest'; // Default to 'newest' if no sort parameter is provided
-    await questions_function.questions(res, sortType);
+    const searchInput = req.query.searchInput;
+    await questions_function.questions(res, sortType, searchInput);
 });
 
 /*

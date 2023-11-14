@@ -10,68 +10,10 @@ export default function QuestionsList() {
     const [showForm, setShowForm] = useState(false);
     const [selectedQuestion, setSelectedQuestion] = useState(null);
     const [sortedQuestions, setSortedQuestions] = useState([]);
-    const [tagNames, setTagNames] = useState({});
-
-    function updateSortedQuestions() {
-        const apiUrl = `http://localhost:8000/questions`;
-        axios.get(apiUrl)
-            .then(response => {
-                setSortedQuestions(response.data);
-            })
-            .catch(error => {
-                console.error('Error fetching questions:', error);
-            });
-    }
 
     useEffect(() => {
-        updateSortedQuestions();
+        handleSort('newest');
     }, []);
-
-    useEffect(() => {
-        let isMounted = true;
-
-        const fetchTagNames = async () => {
-            const tagNamesPromises = [];
-            for (const question of sortedQuestions) {
-                for (const tag of question.tags) {
-                    if (!tagNames[tag]) {
-                        const apiUrl = `http://localhost:8000/tags/tag-id/${tag}`;
-                        const tagPromise = axios.get(apiUrl)
-                            .then(response => {
-                                return { tag, name: response.data };
-                            })
-                            .catch(error => {
-                                console.error('Error fetching tag name:', error);
-                                return { tag, name: null };
-                            });
-                        tagNamesPromises.push(tagPromise);
-                    }
-                }
-            }
-
-            try {
-                const results = await Promise.all(tagNamesPromises);
-
-                if (isMounted) {
-                    setTagNames(prevTagNames => {
-                        const tagNamesMap = { ...prevTagNames };
-                        results.forEach(result => {
-                            tagNamesMap[result.tag] = result.name;
-                        });
-                        return tagNamesMap;
-                    });
-                }
-            } catch (error) {
-                console.error('Error fetching tag names:', error);
-            }
-        };
-
-        fetchTagNames();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [sortedQuestions, tagNames]);
 
     const handleAskQuestion = () => {
         setShowForm(true);
@@ -79,12 +21,11 @@ export default function QuestionsList() {
 
     const handleFormSubmit = async (formData) => {
         const apiUrl = `http://localhost:8000/questions`;
-
         try {
             const response = await axios.post(apiUrl, formData);
             console.log('Question added successfully:', response.data);
 
-            await updateSortedQuestions();
+            await handleSort('newest');
 
             setShowForm(false);
         } catch (error) {
@@ -102,7 +43,7 @@ export default function QuestionsList() {
             const response = await axios.get(apiUrl);
             setSortedQuestions(response.data);
         } catch (error) {
-            console.error('Error sorting questions:', error);
+            console.error('Error fetching questions:', error);
         }
     };
 
@@ -141,7 +82,6 @@ export default function QuestionsList() {
                                 <div
                                     key={question.qid}
                                     className="question-card"
-
                                 >
                                     <div className={"question-left postStats"}>
                                         <p>{question.views} views</p>
@@ -155,7 +95,7 @@ export default function QuestionsList() {
                                         <p style={{"fontSize":"12px"}} dangerouslySetInnerHTML={formatQuestionText(question.text)} />
                                         <div className="tags">
                                             {question.tags.map(tag => (
-                                                <span key={tag} className="badge">{tagNames[tag]}</span>
+                                                <span key={tag} className="badge">{tag}</span>
                                             ))}
                                         </div>
                                     </div>

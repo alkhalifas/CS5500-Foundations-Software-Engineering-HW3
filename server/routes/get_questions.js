@@ -1,11 +1,48 @@
 const Question = require("../models/questions");
 const Answer = require("../models/answers");
+const Tag = require("../models/tags");
 
-exports.questions = async function (res, sortType) {
+const getSearchResultsList = (questions, tags, searchInput) => {
+    const searchWords = searchInput.toLowerCase().trim().split(/\s+/);
+
+    const regularSearchWords = [];
+    const tagSearchWords = [];
+    searchWords.forEach(word => {
+        if (word.startsWith("[") && word.endsWith("]")) {
+            tagSearchWords.push(word.slice(1, -1).toLowerCase());
+        } else {
+            regularSearchWords.push(word);
+        }
+    });
+
+    const regularSearchResults = questions.filter(question => {
+        const questionContent = `${question.title.toLowerCase()} ${question.text.toLowerCase()}`;
+        return regularSearchWords.some(word => questionContent.includes(word));
+    });
+
+    const tagSearchResults = questions.filter(question => {
+        return tagSearchWords.some(tag => questionTags.includes(tag));
+    });
+
+    return regularSearchResults.concat(tagSearchResults);
+};
+
+exports.questions = async function (res, sortType, searchInput) {
     try {
 
-        let questions = await Question.find();
-        let answers = await Answer.find();
+        let questions = await Question.find().populate('tags');
+
+        // Map the tags to their names in each question
+        questions = questions.map(question => ({
+            ...question.toObject(),
+            tags: question.tags.map(tag => tag.name)
+        }));
+
+        if (searchInput) {
+            const tags = await Tag.find();
+            const searchResults = getSearchResultsList(questions, tags, searchInput);
+            questions = searchResults;
+        }
 
         if (sortType === 'newest') {
             questions.sort((a, b) => b.ask_date_time - a.ask_date_time);
