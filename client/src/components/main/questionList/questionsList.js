@@ -1,71 +1,98 @@
 import React, {useEffect, useState} from 'react';
-import dataModel from '../../../models/datamodel';
 import QuestionForm from "../questionForm/questionForm";
 import "./questionList.css"
 import AnswersPage from "../Answers/AnswersPage";
 import QuestionCardTiming from "./QuestionCardTiming";
 import formatQuestionText from "../utils"
+import axios from "axios";
 
 export default function QuestionsList() {
     const [showForm, setShowForm] = useState(false);
     const [selectedQuestion, setSelectedQuestion] = useState(null);
-    const [sortedQuestions, setSortedQuestions] = useState(dataModel.getAllQuestions());
+    const [sortedQuestions, setSortedQuestions] = useState([]);
+    const [tagNames, setTagNames] = useState({});
 
     function updateSortedQuestions() {
-      const questions = dataModel.getAllQuestions();
-      const sortedQuestionsArray = [...questions].sort((a, b) => b.askDate - a.askDate);
-      setSortedQuestions(sortedQuestionsArray);
+        const apiUrl = `http://localhost:8000/questions`;
+        axios.get(apiUrl)
+            .then(response => {
+                setSortedQuestions(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching questions:', error);
+            });
+    }
+
+    function fetchTagNames() {
+        const tagNamesPromises = [];
+        for (const question of sortedQuestions) {
+            for (const tag of question.tags) {
+                if (!tagNames[tag]) {
+                    const apiUrl = `http://localhost:8000/tags/tag-id/${tag}`;
+                    const tagPromise = axios.get(apiUrl)
+                        .then(response => {
+                            return { tag, name: response.data };
+                        })
+                        .catch(error => {
+                            console.error('Error fetching tag name:', error);
+                            return { tag, name: null };
+                        });
+                    tagNamesPromises.push(tagPromise);
+                }
+            }
+        }
+        Promise.all(tagNamesPromises)
+            .then(results => {
+                const tagNamesMap = {};
+                results.forEach(result => {
+                    tagNamesMap[result.tag] = result.name;
+                });
+
+                setTagNames(tagNamesMap);
+            });
     }
 
     useEffect(() => {
         updateSortedQuestions();
     }, []);
 
+    useEffect(() => {
+        fetchTagNames();
+    }, [sortedQuestions]); // Fetch tag names whenever sortedQuestions changes
+
     const handleAskQuestion = () => {
         setShowForm(true);
     };
 
-    const handleFormSubmit = (formData) => {
-        dataModel.addQuestion(formData);
-        updateSortedQuestions();
-        setShowForm(false);
+    const handleFormSubmit = async (formData) => {
+        const apiUrl = `http://localhost:8000/questions`;
+
+        try {
+            const response = await axios.post(apiUrl, formData);
+            console.log('Question added successfully:', response.data);
+
+            await fetchTagNames();
+            await updateSortedQuestions();
+
+            setShowForm(false);
+        } catch (error) {
+            console.error('Error adding question:', error);
+        }
     };
 
     const handleQuestionClick = (question) => {
         setSelectedQuestion(question);
     };
 
-    const handleSort = (sortType) => {
-        let sortedQuestionsArray = [...dataModel.getAllQuestions()];
-
-        if (sortType === 'newest') {
-            sortedQuestionsArray.sort((a, b) => b.askDate - a.askDate);
-        } else if (sortType === 'active') {
-            sortedQuestionsArray.sort((a, b) => {
-                const aAnswers = dataModel.getQuestionAnswers(a.qid);
-                const bAnswers = dataModel.getQuestionAnswers(b.qid);
-
-                if (aAnswers.length === 0 && bAnswers.length === 0) {
-                    return b.askDate - a.askDate;
-                }
-
-                if (aAnswers.length === bAnswers.length) {
-                    const aLatestAnswerDate = aAnswers.reduce((latestDate, answer) =>
-                        Math.max(latestDate, answer.ansDate), a.askDate);
-                    const bLatestAnswerDate = bAnswers.reduce((latestDate, answer) =>
-                        Math.max(latestDate, answer.ansDate), b.askDate);
-                    return bLatestAnswerDate - aLatestAnswerDate;
-                }
-
-                return bAnswers.length - aAnswers.length;
-            });
-        } else if (sortType === 'unanswered') {
-            sortedQuestionsArray = sortedQuestionsArray.filter(
-                (question) => dataModel.getQuestionAnswers(question.qid).length === 0
-            );
+    const handleSort = async (sortType) => {
+        const apiUrl = `http://localhost:8000/questions?sort=${sortType}`;
+        try {
+            const response = await axios.get(apiUrl);
+            await fetchTagNames();
+            setSortedQuestions(response.data);
+        } catch (error) {
+            console.error('Error sorting questions:', error);
         }
-
-        setSortedQuestions(sortedQuestionsArray);
     };
 
     return (
@@ -107,7 +134,7 @@ export default function QuestionsList() {
                                 >
                                     <div className={"question-left postStats"}>
                                         <p>{question.views} views</p>
-                                        <p>{dataModel.getQuestionAnswers(question.qid).length} answers</p>
+                                        <p>{question.answers.length} answers</p>
                                     </div>
                                     <div className={"question-mid"}>
                                         <h4 className={"postTitle"}
@@ -116,8 +143,8 @@ export default function QuestionsList() {
                                         </h4>
                                         <p style={{"fontSize":"12px"}} dangerouslySetInnerHTML={formatQuestionText(question.text)} />
                                         <div className="tags">
-                                            {question.getTagsWithNames(dataModel.tags).map(tag => (
-                                                <span key={tag.id} className="badge">{tag.name}</span>
+                                            {question.tags.map(tag => (
+                                                <span key={tag} className="badge">{tagNames[tag]}</span>
                                             ))}
                                         </div>
                                     </div>
