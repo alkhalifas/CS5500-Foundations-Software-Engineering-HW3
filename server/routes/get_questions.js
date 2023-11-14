@@ -15,16 +15,27 @@ const getSearchResultsList = (questions, tags, searchInput) => {
         }
     });
 
-    const regularSearchResults = questions.filter(question => {
+    const uniqueQuestionIds = new Set();
+
+    const regularSearchResults = questions.reduce((result, question) => {
         const questionContent = `${question.title.toLowerCase()} ${question.text.toLowerCase()}`;
-        return regularSearchWords.some(word => questionContent.includes(word));
-    });
+        if (regularSearchWords.some(word => questionContent.includes(word))) {
+            uniqueQuestionIds.add(question._id.toString());
+            result.push(question);
+        }
+        return result;
+    }, []);
 
     const tagSearchResults = questions.filter(question => {
         return tagSearchWords.some(tag => question.tags.includes(tag));
     });
 
-    return regularSearchResults.concat(tagSearchResults);
+    // Filter out questions already present in tagSearchResults
+    const filteredSearchResults = regularSearchResults.filter(question => {
+        return !tagSearchResults.some(tagQuestion => tagQuestion._id.toString() === question._id.toString());
+    });
+
+    return filteredSearchResults.concat(tagSearchResults);
 };
 
 exports.questions = async function (res, sortType, searchInput) {
