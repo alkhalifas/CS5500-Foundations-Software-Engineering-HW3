@@ -19,7 +19,7 @@ In the sections below, list and describe each contribution briefly.
 - [X] Answers List
 - [x] Create Question
 - [X] Answer Question
-- [ ] Search 
+- [X] Search 
 - [X] Sort
 
 *Add your team's class and sequence diagrams to the design directory*. It is enough to document the design of the server. You can assume the client to be an external entity that will trigger events in the server.
