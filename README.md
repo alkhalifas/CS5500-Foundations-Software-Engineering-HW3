@@ -12,7 +12,10 @@ In the sections below, list and describe each contribution briefly.
 - [X] MongoDB Integration
 - [X] Server Requirements
 - [X] Tags Page
-- [ ] Questions Per Tag Page
+- [X] Questions Per Tag Page
+- [ ] Navigation Pane on left
+- [ ] Design Diagram
+- [ ] Remove .idea
 
 ## Team Member 2 Contribution
 - [x] Questions List
@@ -21,6 +24,13 @@ In the sections below, list and describe each contribution briefly.
 - [X] Answer Question
 - [X] Search 
 - [X] Sort
+- [ ] Factory pattern
+- [ ] Clean up
+
+## Outstanding:
+- [X] Resolve A2 issues
+- [ ] Testing?
+
 
 *Add your team's class and sequence diagrams to the design directory*. It is enough to document the design of the server. You can assume the client to be an external entity that will trigger events in the server.
 
