@@ -13,7 +13,7 @@ In the sections below, list and describe each contribution briefly.
 - [X] Server Requirements
 - [X] Tags Page
 - [X] Questions Per Tag Page
-- [ ] Navigation Pane on left
+- [X] Navigation Pane on left
 - [ ] Design Diagram
 - [ ] Remove .idea
 
