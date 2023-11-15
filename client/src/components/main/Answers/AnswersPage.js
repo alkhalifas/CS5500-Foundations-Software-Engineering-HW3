@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import "./AnswersPage.css"
 import QuestionCardTiming from "../questionList/QuestionCardTiming.js"
-import dataModel from "../../../models/datamodel";
 import AnswerCardTiming from "./AnswerCardTiming";
 import AnswerForm from "../answerForm/answerForm";
 import formatQuestionText from "../utils";
@@ -12,42 +11,48 @@ export default function AnswersPage({question}) {
     const [views, setViews] = useState([]);
     const [showAnswerForm, setShowAnswerForm] = useState(false);
 
-    console.log("question: ", question)
-    function updateSortedAnswers() {
-        // const answers = dataModel.getQuestionAnswers(question.qid);
-        const sortedAnswersArray = [...question.answers].sort((a, b) => b.ansDate - a.ansDate);
-        setAnswers(sortedAnswersArray);
-    }
+    const updateSortedAnswers = useCallback(() => {
+        const answerUrl = `http://localhost:8000/questions/${question._id}/answers`;
+        axios.get(answerUrl)
+            .then(response => {
+                setAnswers(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching answers:', error);
+            });
+    }, [question._id]);
 
     useEffect(() => {
         // Increment views when the component is mounted
-        // question.incrementViews(question._id);
-        setViews(question.views+1);
-
-        const apiUrl = `http://localhost:8000/questions/increment-views/${question._id}`;
-
-        axios.post(apiUrl)
+        const viewUrl = `http://localhost:8000/questions/increment-views/${question._id}`;
+        axios.post(viewUrl)
             .then(response => {
-                console.log("increment-views: ", response.data)
+                setViews(question.views + 1);
             })
             .catch(error => {
-                console.error('Error fetching questions:', error);
+                console.error('Error incrementing views:', error);
             });
 
+        updateSortedAnswers()
 
-
-        // Get answers using DataModel's getQuestionAnswers method
-        updateSortedAnswers();
-    }, [question._id]);
+    }, [question._id, question.views, updateSortedAnswers]);
 
     const handleAnswerQuestion = () => {
         setShowAnswerForm(true);
     };
 
-    const handleFormSubmit = (formData) => {
-        dataModel.addAnswer(question._id, formData);
-        updateSortedAnswers();
-        setShowAnswerForm(false);
+    const handleFormSubmit = async (formData) => {
+        const apiUrl = `http://localhost:8000/questions/${question._id}/answers`;
+
+        try {
+            const response = await axios.post(apiUrl, formData);
+            console.log('Answer added successfully:', response.data);
+
+            await updateSortedAnswers();
+            setShowAnswerForm(false);
+        } catch (error) {
+            console.error('Error adding answer:', error);
+        }
     };
 
     return (

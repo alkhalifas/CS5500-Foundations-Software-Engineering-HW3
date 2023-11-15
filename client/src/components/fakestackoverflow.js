@@ -12,21 +12,26 @@ export default function FakeStackOverflow() {
     const [selectedTag, setSelectedTag] = useState(null);
     const [searchInput, setSearchInput] = useState('');
     const [searchActive, setSearchActive] = useState(false);
+    const [componentKey, setComponentKey] = useState(0);
 
     const handleComponentSelect = (component, tagId = null) => {
-        setSelectedComponent(component);
-        setSelectedTag(tagId);
+        if (selectedComponent !== component) {
+            setSelectedComponent(component);
+            setSelectedTag(tagId);
+        }
         setSearchActive(false);
+        // Increment the componentKey to trigger a re-render
+        setComponentKey(prevKey => prevKey + 1);
     };
 
     const renderComponent = () => {
         return searchActive
-            ? <SearchResultsList searchInput={searchInput} />
+            ? <SearchResultsList key={componentKey} searchInput={searchInput} />
             : (
-                selectedComponent === 'questions' ? <QuestionsList />
-                : selectedComponent === 'tags' ? <TagsList onSelect={tagId => handleComponentSelect('tagQuestions', tagId)} />
-                : selectedComponent === 'tagQuestions' && selectedTag ? <TagQuestionsList tagId={selectedTag} />
-                : null
+                selectedComponent === 'questions' ? <QuestionsList key={componentKey} />
+                    : selectedComponent === 'tags' ? <TagsList key={componentKey} onSelect={tagId => handleComponentSelect('tagQuestions', tagId)} />
+                        : selectedComponent === 'tagQuestions' && selectedTag ? <TagQuestionsList key={componentKey} tagId={selectedTag} />
+                            : null
             );
     };
 

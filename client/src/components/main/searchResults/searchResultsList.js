@@ -1,96 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import dataModel from '../../../models/datamodel';
+import React, { useEffect, useState, useCallback } from 'react';
 import QuestionCardTiming from "../questionList/QuestionCardTiming";
 import formatQuestionText from "../utils"
 import QuestionForm from "../questionForm/questionForm";
 import AnswersPage from "../Answers/AnswersPage";
+import axios from "axios";
 
 export default function SearchResultsList({ searchInput }) {
     const [showForm, setShowForm] = useState(false);
     const [selectedQuestion, setSelectedQuestion] = useState(null);
-    const [originalSearchResults, setOriginalSearchResults] = useState([]);
     const [searchResults, setSearchResults] = useState([]);
-
-    useEffect(() => {
-        const results = getSearchResultsList(searchInput);
-        const sortedResults = [...results].sort((a, b) => b.askDate - a.askDate);
-        setOriginalSearchResults(sortedResults);
-        setSearchResults(sortedResults);
-    }, [searchInput]);
 
     const handleAskQuestion = () => {
         setShowForm(true);
     };
 
-    const handleFormSubmit = (formData) => {
-        dataModel.addQuestion(formData);
-        setShowForm(false);
+    const handleFormSubmit = async (formData) => {
+        const apiUrl = `http://localhost:8000/questions`;
+        try {
+            const response = await axios.post(apiUrl, formData);
+            console.log('Question added successfully:', response.data);
+            setShowForm(false);
+        } catch (error) {
+            console.error('Error adding question:', error);
+        }
     };
 
     const handleQuestionClick = (question) => {
         setSelectedQuestion(question);
     };
 
-    const handleSort = (sortType) => {
-        let sortedResultsArray = [...originalSearchResults];
-
-        if (sortType === 'newest') {
-            sortedResultsArray.sort((a, b) => b.askDate - a.askDate);
-        } else if (sortType === 'active') {
-            sortedResultsArray.sort((a, b) => {
-                const aAnswers = dataModel.getQuestionAnswers(a.qid);
-                const bAnswers = dataModel.getQuestionAnswers(b.qid);
-
-                if (aAnswers.length === 0 && bAnswers.length === 0) {
-                    return b.askDate - a.askDate;
-                }
-
-                if (aAnswers.length === bAnswers.length) {
-                    const aLatestAnswerDate = aAnswers.reduce((latestDate, answer) =>
-                        Math.max(latestDate, answer.ansDate), a.askDate);
-                    const bLatestAnswerDate = bAnswers.reduce((latestDate, answer) =>
-                        Math.max(latestDate, answer.ansDate), b.askDate);
-                    return bLatestAnswerDate - aLatestAnswerDate;
-                }
-
-                return bAnswers.length - aAnswers.length;
+    const handleSort = useCallback((sortType) => {
+        const apiUrl = `http://localhost:8000/questions?sort=${sortType}&searchInput=${searchInput}`;
+        axios.get(apiUrl)
+            .then(response => {
+                setSearchResults(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching search results:', error);
             });
-        } else if (sortType === 'unanswered') {
-            sortedResultsArray = sortedResultsArray.filter(
-                (question) => dataModel.getQuestionAnswers(question.qid).length === 0
-            );
-        }
+    }, [searchInput]);
 
-        setSearchResults(sortedResultsArray);
-    };
-
-    const getSearchResultsList = (searchInput) => {
-        const questions = dataModel.getAllQuestions();
-        const tags = dataModel.getAllTags();
-        const searchWords = searchInput.toLowerCase().trim().split(/\s+/);
-
-        const regularSearchWords = [];
-        const tagSearchWords = [];
-        searchWords.forEach(word => {
-            if (word.startsWith("[") && word.endsWith("]")) {
-                tagSearchWords.push(word.slice(1, -1).toLowerCase());
-            } else {
-                regularSearchWords.push(word);
-            }
-        });
-
-        const regularSearchResults = questions.filter(question => {
-            const questionContent = `${question.title.toLowerCase()} ${question.text.toLowerCase()}`;
-            return regularSearchWords.some(word => questionContent.includes(word));
-        });
-
-        const tagSearchResults = questions.filter(question => {
-            const questionTags = question.tagIds.map(tagId => tags.find(tag => tag.tid === tagId).name.toLowerCase());
-            return tagSearchWords.some(tag => questionTags.includes(tag));
-        });
-
-        return regularSearchResults.concat(tagSearchResults);
-    };
+    useEffect(() => {
+        handleSort('newest');
+    }, [searchInput, handleSort]);
 
     return (
         <div>
@@ -99,7 +51,7 @@ export default function SearchResultsList({ searchInput }) {
             ) : selectedQuestion ? (
                 <div id={"answersHeader"}>
                     <div className="header-container">
-                        <h1></h1>
+                        <h1>Search Results</h1>
                         <button className={"ask-question-button"} onClick={handleAskQuestion}>Ask a Question</button>
                     </div>
                     <AnswersPage question={selectedQuestion} />
@@ -130,14 +82,14 @@ export default function SearchResultsList({ searchInput }) {
                                     <div key={question.qid} className="question-card">
                                         <div className={"question-left postStats"}>
                                             <p>{question.views} views</p>
-                                            <p>{dataModel.getQuestionAnswers(question.qid).length} answers</p>
+                                            <p>{question.answers.length} answers</p>
                                         </div>
                                         <div className={"question-mid"}>
                                             <h4 className={"postTitle"} onClick={() => handleQuestionClick(question)}>{question.title}</h4>
                                             <p style={{"fontSize":"12px"}} dangerouslySetInnerHTML={formatQuestionText(question.text)} />
                                             <div className="tags">
-                                                {question.getTagsWithNames(dataModel.tags).map(tag => (
-                                                    <span key={tag.id} className="badge">{tag.name}</span>
+                                                {question.tags.map(tag => (
+                                                    <span key={tag} className="badge">{tag}</span>
                                                 ))}
                                             </div>
                                         </div>
