@@ -23,12 +23,6 @@ export default function TagQuestionsList({ tag }) {
 
     console.log("questions: ", questions)
 
-    // const questionsWithCurrentTag = dataModel.getAllQuestions().filter(question =>
-    //     question.tagIds.includes(tagId)
-    // );
-
-    // const tagName = dataModel.getTagNameById(tagId);
-
     const handleQuestionClick = (question) => {
         setSelectedQuestion(question);
     };
