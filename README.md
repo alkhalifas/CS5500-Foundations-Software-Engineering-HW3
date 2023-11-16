@@ -32,7 +32,9 @@ In the sections below, list and describe each contribution briefly.
 - [ ] Testing?
 
 ## Design Patterns:
-1. Facade: We followed a facade pattern within the dataModel.js, within various functions such as addQuestion or addAnswer in the sense that we added all the complexities involved in the functionality under a method of that class. Another example is AnswerCardTiming.js and QuestionCardTiming.js in which we hid the complex logic of rendering time into a component that we can easily call.
+1. Facade Pattern: We followed a facade pattern within the routes of our application, such that within various functions like addQuestion or addAnswer in the sense that we added all the complexities involved in the functionality under a method of that class. Another example is AnswerCardTiming.js and QuestionCardTiming.js in which we hid the complex logic of rendering time into a component that we can easily call.
+2. Factory Pattern:
+
 
 *Add your team's class and sequence diagrams to the design directory*. It is enough to document the design of the server. You can assume the client to be an external entity that will trigger events in the server.
 
