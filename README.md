@@ -22,7 +22,6 @@ Read homework specifications [here](https://northeastern-my.sharepoint.com/:w:/r
 - [X] Search 
 - [X] Sort
 - [ ] Factory pattern
-
 - [ ] Testing?
 
 ## Design Patterns:
