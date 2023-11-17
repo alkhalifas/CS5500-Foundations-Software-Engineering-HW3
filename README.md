@@ -32,7 +32,15 @@ Read homework specifications [here](https://northeastern-my.sharepoint.com/:w:/r
 ## Steps to Run:
 
     # Start Mongod
+
     mongod --config /opt/homebrew/etc/mongod.conf --fork
 
     # Populate the Database
+
     node populate_db.js mongodb://127.0.0.1:27017/fake_so
+
+    # Run Cypress - To align with best practices as best as we can, we recycled and made use
+    # of the cypress tests given to us in A2, and adjusted them to be used with this new implementation.
+
+    cd client
+    npx cypress open
