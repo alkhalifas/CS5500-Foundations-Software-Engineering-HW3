@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import dataModel from '../../../models/datamodel';
 import "./tagsList.css"
 import QuestionForm from "../questionForm/questionForm";
 import TagQuestionsList from "../TagQuestionsList/TagQuestionsList";
@@ -8,7 +7,6 @@ import axios from "axios"; // Import the TagQuestionsList component
 export default function TagsList() {
     const [showForm, setShowForm] = useState(false);
     const [selectedTag, setSelectedTag] = useState(false);
-    // const tagsWithQuestionCount = dataModel.getAllTagsWithQuestionCount();
     const [tags, setTags] = useState([]);
 
     useEffect(() => {
@@ -22,9 +20,6 @@ export default function TagsList() {
             });
     }, []);
 
-    console.log("tags: ", tags)
-
-
     const handleAskQuestion = () => {
         setShowForm(true);
     };
@@ -34,9 +29,16 @@ export default function TagsList() {
         console.log("handleTagClick: ", tag)
     };
 
-    const handleFormSubmit = (formData) => {
-        dataModel.addQuestion(formData);
-        setShowForm(false);
+    const handleFormSubmit = async (formData) => {
+        const apiUrl = `http://localhost:8000/questions`;
+        try {
+            const response = await axios.post(apiUrl, formData);
+            console.log('Question added successfully:', response.data);
+
+            setShowForm(false);
+        } catch (error) {
+            console.error('Error adding question:', error);
+        }
     };
 
     return (

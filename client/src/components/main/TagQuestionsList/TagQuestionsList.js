@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import dataModel from '../../../models/datamodel';
 import QuestionCardTiming from "../questionList/QuestionCardTiming";
 import formatQuestionText from "../utils";
 import AnswersPage from "../Answers/AnswersPage";
@@ -19,9 +18,7 @@ export default function TagQuestionsList({ tag }) {
             .catch(error => {
                 console.error('Error fetching questions:', error);
             });
-    }, []);
-
-    console.log("questions: ", questions)
+    }, [tag._id]);
 
     const handleQuestionClick = (question) => {
         setSelectedQuestion(question);
@@ -37,7 +34,6 @@ export default function TagQuestionsList({ tag }) {
             {selectedQuestion ? (
                 <div id={"answersHeader"}>
                     <div className="header-container">
-                        <h1></h1>
                     </div>
                     <AnswersPage question={selectedQuestion} />
 
@@ -49,7 +45,6 @@ export default function TagQuestionsList({ tag }) {
                             <div
                                 key={question._id}
                                 className="question-card"
-                                // onClick={() => handleQuestionClick(question)}
                             >
                                 <div className={"question-left postStats"}>
                                     <p>{question.views} views</p>
@@ -61,8 +56,6 @@ export default function TagQuestionsList({ tag }) {
                                     >{question.title}
                                     </h4>
                                     <p style={{"fontSize":"12px"}} dangerouslySetInnerHTML={formatQuestionText(question.text)} />
-                                    {/*<p>Tags: {question.tags}</p>*/}
-                                    {/*<p>Tags: {question.getTagNames(dataModel.tags).join(', ')}</p>*/}
                                     <div className="tags">
                                         {question.tags.map(tag => (
                                             <span key={tag.id} className="badge">{tag.name}</span>
@@ -79,8 +72,6 @@ export default function TagQuestionsList({ tag }) {
                     ))}
                 </div>
             )}
-
-
         </>
     );
 }
