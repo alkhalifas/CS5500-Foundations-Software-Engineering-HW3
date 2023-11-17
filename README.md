@@ -5,7 +5,7 @@ Read homework specifications [here](https://northeastern-my.sharepoint.com/:w:/r
 
 In the sections below, list and describe each contribution briefly.
 
-## Team Member 1 Contribution
+## Team Member 1 Contribution (Saleh)
 - [X] Schemas
 - [X] Populate Integration
 - [X] Server API Routes
@@ -14,10 +14,11 @@ In the sections below, list and describe each contribution briefly.
 - [X] Tags Page
 - [X] Questions Per Tag Page
 - [X] Navigation Pane on left
-- [ ] Design Diagram
+- [X] Design Diagram - Except add question add answer since Vidhi will implement factory pattern
 - [X] Remove .idea
+- [X] Testing
 
-## Team Member 2 Contribution
+## Team Member 2 Contribution (Vidhi)
 - [x] Questions List
 - [X] Answers List
 - [x] Create Question
@@ -29,7 +30,7 @@ In the sections below, list and describe each contribution briefly.
 
 ## Outstanding:
 - [X] Resolve A2 issues
-- [ ] Testing?
+
 
 ## Design Patterns:
 1. Facade Pattern: We followed a facade pattern within the routes of our application, such that within various functions like addQuestion or addAnswer in the sense that we added all the complexities involved in the functionality under a method of that class. Another example is AnswerCardTiming.js and QuestionCardTiming.js in which we hid the complex logic of rendering time into a component that we can easily call.
