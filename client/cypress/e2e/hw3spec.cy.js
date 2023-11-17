@@ -290,6 +290,7 @@ describe('New Answer Page 3', () => {
         cy.get('#answerUsernameInput').type('joym');
         cy.contains('Post Answer').click();
         cy.contains('Answer text cannot be empty');
+
     });
 });
 
