@@ -1,15 +1,15 @@
 const Answer = require("../models/answers");
 const Question = require("../models/questions");
+const elementFactory = require("../models/elementFactory");
 
 async function answerCreate(text, ans_by, ans_date_time) {
     try {
-        const tempAnswer = {
+        const ans = elementFactory.create_element('Answer', {
             text: text,
             ans_by: ans_by,
             ans_date_time: ans_date_time,
-        };
+        });
 
-        const ans = new Answer(tempAnswer);
         await ans.save();
         return ans;
     } catch (error) {

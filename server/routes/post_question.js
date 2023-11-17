@@ -1,9 +1,10 @@
 const Tag = require("../models/tags");
 const Question = require("../models/questions");
+const elementFactory = require("../models/elementFactory");
 
 async function questionCreate(title, text, tags, answers, asked_by, ask_date_time, views) {
     try {
-        const tempQuestion = {
+        const qstn = elementFactory.create_element('Question', {
             title: title,
             text: text,
             tags: tags,
@@ -11,9 +12,8 @@ async function questionCreate(title, text, tags, answers, asked_by, ask_date_tim
             answers: answers,
             ask_date_time: ask_date_time,
             views: views,
-        };
+        });
 
-        const qstn = new Question(tempQuestion);
         await qstn.save();
         return qstn;
     } catch (error) {
@@ -28,7 +28,7 @@ async function tagCreate(name) {
 
         if (!tag) {
             // Create a new tag if it doesn't exist
-            tag = new Tag({ name: name.toLowerCase() });
+            tag = elementFactory.create_element('Tag', { name: name.toLowerCase() });
             await tag.save();
         }
 
