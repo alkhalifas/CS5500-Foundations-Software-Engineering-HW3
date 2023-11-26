@@ -1,0 +1,18 @@
+Grader: Yuanqiao Li
+
+Failed test cases:
+
+7.2 | Checks if all tags exist
+This test case goes to tags and checks if all tags exist.
+It fails because for our testing_populate_db.js one tag named "Flutter" has 0 question in it, but it exists. Your website does not show this tag.
+
+7.3 | Checks if all questions exist inside tags
+This test case goes to tags and checks if all questions exist.
+It fails because for our testing_populate_db.js one tag named "Flutter" has 0 question in it, but it exists. Your website does not show this tag.
+
+Testing section score: ( (90 - (3.33 * 2)) / 90 ) * 80 = 74.08
+
+Eslint has less than 2 errors
+read me has design patterns.
+
+Total score: 124.08
