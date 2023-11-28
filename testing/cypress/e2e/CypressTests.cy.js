@@ -7,11 +7,13 @@ describe('Cypress Tests repeated from React assignment', () => {
     beforeEach(() => {
         // Seed the database before each test
         cy.exec('node ../server/populate_db.js mongodb://127.0.0.1:27017/fake_so');
+        cy.wait(5000);
     });
 
     afterEach(() => {
         // Clear the database after each test
         cy.exec('node ../server/remove_db.js mongodb://127.0.0.1:27017/fake_so')
+        
     });
 
 
