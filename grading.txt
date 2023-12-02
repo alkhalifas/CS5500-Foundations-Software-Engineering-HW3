@@ -16,3 +16,4 @@ Eslint has less than 2 errors
 read me has design patterns.
 
 Total score: 124.08
+design pattern: 13/13
